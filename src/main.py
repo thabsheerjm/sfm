@@ -96,7 +96,7 @@ for i in range(len(gray)-1):
     # Triangulate 3D points and assign color based on the correct projection matrix
     points_3d_list, colors_list = tg.triangulate_and_color(P1, correct_P2, keypoints1, keypoints2, inliers, color_image1, points_3d_list, colors_list)
 
-    if 1 == 3:
+    if i == 3:
         break
     
 vs.save_point_cloud(points_3d_list, colors_list, filename="colored_point_cloud.ply")
