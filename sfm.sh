@@ -1,8 +1,15 @@
 #!/bin/bash 
 
-#Run the main.py
 
+
+
+# Defin vriables
+IMAGE_DIR="data/images/"
+OUTPUT_DIR="results/"
+
+
+#Run the main.py
 python3 main.py \
-    --image_dir data/images/\
-    --output_dir resulst/\
-    
+    --image_dir "$IMAGE_DIR"\
+    --output_dir "$OUTPUT_DIR"
+
