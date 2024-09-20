@@ -1,4 +1,4 @@
-import numpy as np 
+import cupy as cp 
 
 def triangulate_point(p1,p2,x1,x2):
     """
@@ -14,7 +14,7 @@ def triangulate_point(p1,p2,x1,x2):
         X: The triangulated 3D point (in homogeneous coordinates).
     """
 
-    A = np.zeros((4,4))
+    A = cp.zeros((4,4))
 
     #Build the linear sys of equations
     A[0] = x1[0] * p1[2] - p1[0]
@@ -23,7 +23,7 @@ def triangulate_point(p1,p2,x1,x2):
     A[3] = x2[1] * p2[2] - p2[1]
 
     #solve for x
-    _,_,Vt = np.linalg.svd(A)
+    _,_,Vt = cp.linalg.svd(A)
     x = Vt[-1]
     x = x / x[3] # convert to non-homogeneous coordinates
     return x[:3]
@@ -47,20 +47,20 @@ def triangulate_points(p1,p2,keypoints1,keypoints2,matches):
     points_3d = []
 
     for (i,j) in matches:
-        x1 = np.array([keypoints1[i][0], keypoints1[i][1],1]) #homogeneous coordinates
-        x2 = np.array([keypoints2[j][0], keypoints2[j][1],1])
+        x1 = cp.array([keypoints1[i][0], keypoints1[i][1],1]) #homogeneous coordinates
+        x2 = cp.array([keypoints2[j][0], keypoints2[j][1],1])
 
         # TRiangulate the 3D point
         x = triangulate_point(p1,p2,x1,x2)
         points_3d.append(x)
 
-    return np.array(points_3d)
+    return cp.array(points_3d)
 
 
 def triangulate_and_color(P1, P2, keypoints1, keypoints2, matches, color_image, points_3d_list, colors_list):
     for (i, j) in matches:
-        x1 = np.array([keypoints1[i][0], keypoints1[i][1], 1])
-        x2 = np.array([keypoints2[j][0], keypoints2[j][1], 1])
+        x1 = cp.array([keypoints1[i][0], keypoints1[i][1], 1])
+        x2 = cp.array([keypoints2[j][0], keypoints2[j][1], 1])
 
         # Triangulate the 3D point
         X = triangulate_point(P1, P2, x1, x2)
@@ -90,17 +90,17 @@ def check_cheirality(P1, P2, points_3d):
     """
      
     # project points onto to the cam1
-    points1 = P1 @ np.hstack((points_3d, np.ones((points_3d.shape[0], 1)))).T
+    points1 = P1 @ cp.hstack((points_3d, cp.ones((points_3d.shape[0], 1)))).T
     points1 = points1.T
     depth1 = points1[:,2] # Z-coordinate
 
     # project points onto to the cam1
-    points2 = P2 @ np.hstack((points_3d, np.ones((points_3d.shape[0], 1)))).T
+    points2 = P2 @ cp.hstack((points_3d, cp.ones((points_3d.shape[0], 1)))).T
     points2 = points2.T
     depth2 = points2[:,2]
 
     # check if the majority of points have positive depth in both views
-    return np.sum(depth1>0)>(0.5*len(depth1)) and np.sum(depth2>0)>(0.5*len(depth2))
+    return cp.sum(depth1>0)>(0.5*len(depth1)) and cp.sum(depth2>0)>(0.5*len(depth2))
 
 
 
