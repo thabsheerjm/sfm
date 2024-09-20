@@ -1,4 +1,4 @@
-import cupy as cp 
+import numpy as np 
 import random
 
 def estimate_fundamental_matrix(matches, key1, key2):
@@ -18,16 +18,16 @@ def estimate_fundamental_matrix(matches, key1, key2):
         x2, y2 = key2[j]
         A.append([x2*x1,x2*y1,x2,y2*x1,y2*y1,y2,x1,y1,1])
     
-    A = cp.array(A)
+    A = np.array(A)
 
     # SVD on A
-    U, S, Vt = cp.linalg.svd(A)
+    U, S, Vt = np.linalg.svd(A)
     F = Vt[-1].reshape(3,3)
 
     #Enforce rank=2 constraint by setting smallest singular value to zero
-    U, S, Vt = cp.linalg.svd(F)
+    U, S, Vt = np.linalg.svd(F)
     S[2]=0
-    F = U @ cp.diag(S) @ Vt
+    F = U @ np.diag(S) @ Vt
 
     return F
 
@@ -59,11 +59,11 @@ def ransac_F(matches,key1,key2,num_iterations=1e3,threshold=1e-2):
         for (i,j) in matches:
             x1,y1 = key1[i]
             x2,y2 = key2[j]
-            x1_h = cp.array([x1,y1,1])
-            x2_h = cp.array([x2,y2,1])
+            x1_h = np.array([x1,y1,1])
+            x2_h = np.array([x2,y2,1])
 
             # Epipolar constraint error: x2.T * F * x1 should be close to 0
-            error = cp.abs(x2_h.T @ F @ x1_h)
+            error = np.abs(x2_h.T @ F @ x1_h)
             if error< threshold:
                 inliers.append((i,j))
 
@@ -103,16 +103,16 @@ def decompose_essential_matrix(E):
     """
 
     # perform svd on E
-    U, S, Vt = cp.linalg.svd(E)
+    U, S, Vt = np.linalg.svd(E)
 
     #Ensure that the determinant of u and Vt is positive (to avoid reflections)
-    if cp.linalg.det(U) < 0:
+    if np.linalg.det(U) < 0:
         U *= -1
-    if cp.linalg.det(Vt) < 0:
+    if np.linalg.det(Vt) < 0:
         Vt *= -1
 
     # W is special matrix used to create the two posiible rotation matrices
-    W = cp.array([[0, -1, 0],
+    W = np.array([[0, -1, 0],
                  [1, 0, 0],
                  [0, 0, 1]])
     
