@@ -1,7 +1,8 @@
 
 import numpy as np
+import os
 import matplotlib.pyplot as plt
-from open3d import geometry, io, visualization
+from open3d import geometry, io, visualization, utility
 
 def plot_3d_points(points_3d):
     """
@@ -23,14 +24,16 @@ def plot_3d_points(points_3d):
 def save_point_cloud(points_3d, colors, filename="output_cloud.ply"):
     points = np.array(points_3d)
     colors = np.array(colors)
-    dir = '../results/pointcloud/'
+    base_dir = os.path.dirname(os.path.abspath(__file__))
+    dir = os.path.join(base_dir, '../results/pointcloud/')
 
     # Create Open3D point cloud object
     point_cloud = geometry.PointCloud()
-    point_cloud.points = geometry.Vector3dVector(points)
-    point_cloud.colors = geometry.Vector3dVector(colors)
+    point_cloud.points = utility.Vector3dVector(points)
+    point_cloud.colors = utility.Vector3dVector(colors)
 
     io.write_point_cloud(str(dir+filename), point_cloud)
+
 
 def visualize_point_cloud(points_3d, colors):
     points = np.array(points_3d)
@@ -38,8 +41,8 @@ def visualize_point_cloud(points_3d, colors):
 
     # Create Open3D point cloud object
     point_cloud = geometry.PointCloud()
-    point_cloud.points = geometry.Vector3dVector(points)
-    point_cloud.colors = geometry.Vector3dVector(colors)
+    point_cloud.points = utility.Vector3dVector(points)
+    point_cloud.colors = utility.Vector3dVector(colors)
 
     # Visualize point cloud
     visualization.draw_geometries([point_cloud])

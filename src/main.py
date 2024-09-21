@@ -10,6 +10,9 @@ import visualization as vs
 import matplotlib.pyplot as plt
 import numpy as np
 
+import os 
+os.environ["NUMEXPR_MAX_THREADS"] = "24"
+
 
 K = np.array([
     [2559.68, 0, 1536],
@@ -25,7 +28,7 @@ points_3d_list = []
 colors_list = []
 
 # Iterate over pairs of consecutive images
-for i in range(len(gray)-1):
+for i in range(len(gray)-120):
     image1 = gray[i]
     image2 = gray[i+1]
     color_image1 = images[i]
@@ -42,12 +45,6 @@ for i in range(len(gray)-1):
 
     #Estimate the fundamental matrix using RANSAC
     F, inliers = fdm.ransac_F(matches, keypoints1, keypoints2)
-    # print(f"Fundamental Matrix between image{i} and image{i+1}: \n",F)
-
-
-    # # Print the number of valid matches and inliers
-    # print(f"Number of matches: {len(matches)}")
-    # print(f"Number of inliers after RANSAC: {len(inliers)}")
 
     # Essential matrix
     E = fdm.compute_essential_matrix(F, K)
@@ -96,9 +93,7 @@ for i in range(len(gray)-1):
     # Triangulate 3D points and assign color based on the correct projection matrix
     points_3d_list, colors_list = tg.triangulate_and_color(P1, correct_P2, keypoints1, keypoints2, inliers, color_image1, points_3d_list, colors_list)
 
-    if i == 3:
-        break
-    
+
 vs.save_point_cloud(points_3d_list, colors_list, filename="colored_point_cloud.ply")
 
 vs.visualize_point_cloud(points_3d_list, colors_list)
