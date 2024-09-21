@@ -26,9 +26,10 @@ gray, images = data_loader.load_images('data/colmap_southB/images/')
 
 points_3d_list = []
 colors_list = []
+camera_positions = []  
 
 # Iterate over pairs of consecutive images
-for i in range(len(gray)-120):
+for i in range(len(gray)-1):
     image1 = gray[i]
     image2 = gray[i+1]
     color_image1 = images[i]
@@ -44,7 +45,11 @@ for i in range(len(gray)-120):
     matches = fm.match_features(descr1,descr2)
 
     #Estimate the fundamental matrix using RANSAC
-    F, inliers = fdm.ransac_F(matches, keypoints1, keypoints2)
+    if len(matches) >= 8:
+        F, inliers = fdm.ransac_F(matches, keypoints1, keypoints2)
+    else:
+        print(f"Not enough matches to compute the Fundamental Matrix between images {i} and {i+1}. Skipping...")
+        continue
 
     # Essential matrix
     E = fdm.compute_essential_matrix(F, K)
@@ -93,10 +98,9 @@ for i in range(len(gray)-120):
     # Triangulate 3D points and assign color based on the correct projection matrix
     points_3d_list, colors_list = tg.triangulate_and_color(P1, correct_P2, keypoints1, keypoints2, inliers, color_image1, points_3d_list, colors_list)
 
+    camera_positions.append(t)
 
-vs.save_point_cloud(points_3d_list, colors_list, filename="colored_point_cloud.ply")
-
-vs.visualize_point_cloud(points_3d_list, colors_list)
+vs.save_point_cloud_with_trajectory(points_3d_list, colors_list, camera_positions, filename="colored_point_cloud_with_trajectory.ply")
 
 
 
