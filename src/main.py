@@ -13,7 +13,6 @@ import numpy as np
 import os
 
 
-
 def main():
     # Parse arguments
     args = hp.parse_arguments()
