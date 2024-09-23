@@ -35,12 +35,12 @@ def save_point_cloud(points_3d, colors, filename="output_cloud.ply"):
     io.write_point_cloud(str(dir+filename), point_cloud)
 
 
-def save_point_cloud_with_trajectory(points_3d, colors, camera_positions, filename="output_with_trajectory.ply"):
+def save_point_cloud_with_trajectory(points_3d, colors, camera_positions,out_dir, filename="output_with_trajectory.ply"):
     points = np.array(points_3d)
     colors = np.array(colors)
     
     base_dir = os.path.dirname(os.path.abspath(__file__))
-    dir = os.path.join(base_dir, '../results/pointcloud/')
+    out_dir = os.path.join(base_dir, '../results/pointcloud/')
     # Create an Open3D point cloud object
     point_cloud = geometry.PointCloud()
 
