@@ -1,8 +1,8 @@
 #!/bin/bash 
 
 # Defin vriables
-DATA_NAME="South Building"
-IMAGE_DIR="data/images/"
+DATA_NAME="colmap"
+IMAGE_DIR="data/colmap_southB/images/"
 OUTPUT_DIR="results/pointcloud/"
 FOCAL_LENGTH=2559.68
 PRINCIPAL_POINT_X=1536
